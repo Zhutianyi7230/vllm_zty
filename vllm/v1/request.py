@@ -157,6 +157,19 @@ class Request:
         # The number of tokens that have been computed remotely.
         self.num_external_computed_tokens = 0
 
+        # Parallel sampling support.
+        # When parallel_sampling_n > 1, this request should be split after prefill.
+        self.parallel_sampling_n: int = 1
+
+        # Child request fields.
+        # parent_request_id: ID of the original parent request (for split children).
+        # child_index: Index of this child request (0 for original parent, 1..n-1 for split children).
+        self.parent_request_id: str | None = None
+        self.child_index: int = 0
+
+        # KV load request ID (for PD separation scenario).
+        self.kv_load_request_id: str | None = None
+
         self.block_hashes: list[BlockHash] = []
         self.get_hash_new_full_blocks: Callable[[], list[BlockHash]] | None = None
         if block_hasher is not None:
@@ -192,6 +205,7 @@ class Request:
             trace_headers=request.trace_headers,
             block_hasher=block_hasher,
             resumable=request.resumable,
+            parallel_sampling_n=request.parallel_sampling_n,
         )
 
     def append_output_token_ids(

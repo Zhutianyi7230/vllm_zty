@@ -68,6 +68,9 @@ class EngineCoreRequest(
     # client for this request when scaling out the front-end.
     client_index: int = 0
 
+    # Number of parallel samples (n > 1 means this request will be split after prefill).
+    parallel_sampling_n: int = 1
+
     # Used in DP case to indicate which wave of requests this is expected to
     # belong to, to cover a race condition where the request is sent before
     # a wave finished notification is received.
